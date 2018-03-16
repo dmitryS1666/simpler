@@ -15,8 +15,9 @@ module Simpler
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
 
-      set_headers('Content-Type', 'text/html')
       send(action)
+      check_template
+      set_headers('Content-Type', 'text/html')
       write_response
 
       @response.finish
@@ -35,7 +36,8 @@ module Simpler
     end
 
     def render_body
-      View.new(@request.env).render(binding)
+      renderer = View.renderer(@request.env)
+      renderer.new(@request.env).render(binding)
     end
 
     def params
@@ -54,5 +56,17 @@ module Simpler
       @response.status = code
     end
 
+    def check_template
+      template = @request.env['simple.template']
+
+      if template.is_a? Hash
+        case template.key.first
+          when :plain
+            set_headers('Content-Type', 'text/plain')
+        end
+      end
+    end
+
   end
+
 end
