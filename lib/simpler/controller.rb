@@ -44,6 +44,10 @@ module Simpler
       @request.params
     end
 
+    def req_params
+      @request.params.update(@request.env['simpler.route_params'])
+    end
+
     def render(template)
       @request.env['simpler.template'] = template
     end
